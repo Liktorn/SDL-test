@@ -9,10 +9,11 @@ struct Particle
 	double m_speed;
 	double m_direction;
 
-public:
+
 	Particle();
 	~Particle();
 	void update(int interval);
+	void init();
 };
 
 } /* end namespace bw*/
