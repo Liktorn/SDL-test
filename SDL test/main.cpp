@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
 
 		// Making NPARTICLES amount of random particles and print them on the screen
 		const Particle * const pParticles = swarm.getParticles();
-		for (int i = 0; i < Swarm::NPARTICLES; i++)
+		for (int i = 0; i < Swarm::NPARTICLES; i++) 
 		{
 			Particle particle = pParticles[i];
 
