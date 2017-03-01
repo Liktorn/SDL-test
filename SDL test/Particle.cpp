@@ -1,38 +1,34 @@
 #include "Particle.h"
+#include <math.h>
 #include <stdlib.h>
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
 
 
 namespace bw
 {
 
-void Particle::update()
-{
-	//Update the position
-	m_x += xSpeed;
-	m_y += ySpeed;
 
-	//Checking so they are not outside of the screen
-	if (m_x < -1.0 || m_x > 1.0)
-		xSpeed = -xSpeed;
-	if (m_y < -1.0 || m_y > 1.0)
-		ySpeed = -ySpeed;
-}
 Particle::Particle()
 {
-	// starting in a random location
-	m_x = ((2.0 * rand()) / RAND_MAX) - 1;
-	m_y = ((2.0 * rand()) / RAND_MAX) - 1;
-
-	//getting a random speed
-	speed = 0.005;
-	xSpeed = speed * (((2.0 * rand()) / RAND_MAX) - 1);
-	ySpeed = speed * (((2.0 * rand()) / RAND_MAX) - 1);
-
+	// initiate a random direction in radiants
+	m_direction = (2 * M_PI * rand()) / RAND_MAX;
+	// Initiate arandom speed
+	m_speed = (0.0001 * rand()) / RAND_MAX;
 }
 
 
 Particle::~Particle()
 {
+}
+
+void Particle::update(int interval)
+{
+	double xSpeed = m_speed * cos(m_direction);
+	double ySpeed = m_speed * sin(m_direction);
+	// xSpeed * interval makes the game runn equally fast on different computers
+	m_x += xSpeed * interval;
+	m_y += ySpeed * interval;
 }
 
 } /*end of namespace*/

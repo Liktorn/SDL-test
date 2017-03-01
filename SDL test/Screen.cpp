@@ -3,7 +3,7 @@
 namespace bw {
 
 Screen::Screen() :
-	m_window(NULL), m_renderer(NULL), m_texture(NULL), m_buffer(NULL)
+	m_window(NULL), m_renderer(NULL), m_texture(NULL), m_buffer1(NULL), m_buffer2(NULL)
 {
 }
 
@@ -54,10 +54,13 @@ bool Screen::init()
 	}
 
 	// allocate enough memory for all the pixels on the screen
-	m_buffer = new Uint32[SCREEN_WIDTH*SCREEN_HEIGHT];
+	m_buffer1 = new Uint32[SCREEN_WIDTH*SCREEN_HEIGHT];
+	m_buffer2 = new Uint32[SCREEN_WIDTH*SCREEN_HEIGHT];
 
 	// Sets a particular part of the memory with a value (0xFF)
-	memset(m_buffer, 0, SCREEN_WIDTH*SCREEN_HEIGHT * sizeof(Uint32));
+	memset(m_buffer1, 0, SCREEN_WIDTH*SCREEN_HEIGHT * sizeof(Uint32));
+	memset(m_buffer2, 0, SCREEN_WIDTH*SCREEN_HEIGHT * sizeof(Uint32));
+
 
 	// Setting a individual pixel to an color
 	// 0xRRGGBB??
@@ -83,7 +86,8 @@ bool Screen::processEvents()
 void Screen::close()
 {
 	// Destruction process, then quit
-	delete[] m_buffer;
+	delete[] m_buffer1;
+	delete[] m_buffer2;
 	SDL_DestroyRenderer(m_renderer);
 	SDL_DestroyTexture(m_texture);
 	SDL_DestroyWindow(m_window);
@@ -93,7 +97,7 @@ void Screen::close()
 void Screen::update()
 {
 	// Use this function to update the given texture rectangle with new pixel data
-	SDL_UpdateTexture(m_texture, NULL, m_buffer, SCREEN_WIDTH * sizeof(Uint32));
+	SDL_UpdateTexture(m_texture, NULL, m_buffer1, SCREEN_WIDTH * sizeof(Uint32));
 	// Use this function to clear the current rendering target with the drawing color
 	SDL_RenderClear(m_renderer);
 	// Use this function to copy a portion of the texture to the current rendering target
@@ -117,11 +121,57 @@ void Screen::setPixel(int x, int y, Uint8 red, Uint8 green, Uint8 blue)
 	color <<= 8;
 	color += 0xFF;
 
-	m_buffer[(y * SCREEN_WIDTH) + x] = color;
+	m_buffer1[(y * SCREEN_WIDTH) + x] = color;
 }
-void Screen::clear()
+
+void Screen::boxBlur()
 {
-	memset(m_buffer, 0, SCREEN_WIDTH*SCREEN_HEIGHT * sizeof(Uint32));
+	// Swap the buffers so the pixels is in m_buffer2 and we are drawing to m_buffer1
+	Uint32 *temp = m_buffer1;
+	m_buffer1 = m_buffer2;
+	m_buffer2 = temp;
+
+	// Itterate through all the pixels
+	for (int y = 0; y < SCREEN_HEIGHT; y++)
+	{
+		for (int x = 0; x < SCREEN_WIDTH; x++)
+		{
+			int redTotal = 0;		// 000
+			int greenTotal = 0;		// 0X0
+			int blueTotal = 0;		// 000
+			// going trough a "box" of pixels surounding the pixel
+			for (int row = -1; row <= 1; row++)
+			{
+				for (int col = -1; col <= 1; col++)
+				{
+					int currentX = x + col;
+					int currentY = y + row;
+					// Ignore pixels that are outside of the screen
+					if (currentX >= 0 && currentX < SCREEN_WIDTH && currentY >= 0 && currentY < SCREEN_HEIGHT)
+					{
+						Uint32 color = m_buffer2[currentY*SCREEN_WIDTH + currentX];
+						//betwise out the singular colors from color
+						Uint8 red = color >> 24;
+						Uint8 green = color >> 16;
+						Uint8 blue = color >> 8;
+						//adding the amount of surounding colors of a type
+						redTotal += red;
+						greenTotal += green;
+						blueTotal += blue;
+
+					}
+				}
+			}
+			//make a avarage color based on the colors
+			Uint8 red = redTotal / 9;
+			Uint8 green = greenTotal / 9;
+			Uint8 blue = blueTotal / 9;
+
+			setPixel(x, y, red, green, blue);
+		}
+	}
+
+
 }
 
 } //namespace bw

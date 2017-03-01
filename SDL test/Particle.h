@@ -6,14 +6,13 @@ struct Particle
 {
 	double m_x;
 	double m_y;
-	double speed;
-	double xSpeed;
-	double ySpeed;
+	double m_speed;
+	double m_direction;
 
 public:
 	Particle();
 	~Particle();
-	void update();
+	void update(int interval);
 };
 
 } /* end namespace bw*/

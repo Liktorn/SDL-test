@@ -24,12 +24,12 @@ int main(int argc, char ** argv)
 	// main loop
 	while (true)
 	{	
-		screen.clear();
-		//update the swarm 
-		swarm.update();
-
 		//returns the ticks since the loop started to elapsed
 		int elapsed = SDL_GetTicks();
+
+		//update the swarm 
+		swarm.update(elapsed);
+		
 		// sin() makes a value that goes from -1 to 1
 		// this makes it go from 0 to 255 (unsigned char is max 255)
 		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.001)) * 128);
@@ -43,32 +43,14 @@ int main(int argc, char ** argv)
 			Particle particle = pParticles[i];
 
 			int x = (particle.m_x + 1) * Screen::SCREEN_WIDTH / 2;
-			int y = (particle.m_y + 1) * Screen::SCREEN_HEIGHT / 2;
+			//some magic to make it a circle and not a oval
+			int y = particle.m_y  * Screen::SCREEN_WIDTH / 2 + Screen::SCREEN_HEIGHT/2;
 
 			screen.setPixel(x, y, red, green, blue);
 		}
-		
-		/*		//returns the ticks since the loop started to elapsed
-		int elapsed = SDL_GetTicks();
-		// sin() makes a value that goes from -1 to 1
-		// this makes it go from 0 to 255 (unsigned char is max 255)
-		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.001)) * 128);
-		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.002)) * 128);
-		unsigned char blue = (unsigned char)((1 + sin(elapsed * 0.003)) * 128);
 
-		for (int y = 0; y < Screen::SCREEN_HEIGHT; y++)
-			for (int x = 0; x < Screen::SCREEN_WIDTH; x++)
-				screen.setPixel(x, y, red, green, blue);
-*/
-/*
-		// Draw the whole screen in radiant
-		for (int y = 0; y < Screen::SCREEN_HEIGHT; y++)
-			for (int x = 0; x < Screen::SCREEN_WIDTH; x++)
-				screen.setPixel(x, y, x*0.32, 0, y*0.42);
-*/
-		// draw an individual pixel
-		//screen.setPixel(400, 300, 255, 255, 255);
-
+		//blur effect
+		screen.boxBlur();
 
 		// Draw the screen
 		screen.update();
