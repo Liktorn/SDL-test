@@ -32,9 +32,9 @@ int main(int argc, char ** argv)
 		
 		// sin() makes a value that goes from -1 to 1
 		// this makes it go from 0 to 255 (unsigned char is max 255)
-		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.001)) * 128);
-		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.002)) * 128);
-		unsigned char blue = (unsigned char)((1 + sin(elapsed * 0.003)) * 128);
+		unsigned char red = (unsigned char)((1 + sin(elapsed * 0.0001)) * 128);
+		unsigned char green = (unsigned char)((1 + sin(elapsed * 0.0002)) * 128);
+		unsigned char blue = (unsigned char)((1 + sin(elapsed * 0.0003)) * 128);
 
 		// Making NPARTICLES amount of random particles and print them on the screen
 		const Particle * const pParticles = swarm.getParticles();
@@ -60,8 +60,8 @@ int main(int argc, char ** argv)
 	}
 
 	//Pause the console so that the window does not exit imediatly
-	std::cout << "like this" << std::endl;
-	system("PAUSE"); // <-- this will stop the console from closing.
+	//std::cout << "like this" << std::endl;
+	//system("PAUSE"); // <-- this will stop the console from closing.
 
 	//destroy all windows, renderers, textures etc...
 	screen.close();
